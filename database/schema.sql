@@ -1,0 +1,38 @@
+CREATE DATABASE IF NOT EXISTS lan_chat_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE lan_chat_db;
+CREATE TABLE IF NOT EXISTS users (
+ user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ username VARCHAR(40) NOT NULL UNIQUE,
+ password_hash VARCHAR(100) NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS chat_sessions (
+ session_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ ended_at TIMESTAMP NULL
+);
+CREATE TABLE IF NOT EXISTS messages (
+ message_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ session_id BIGINT NOT NULL,
+ sender_id BIGINT NOT NULL,
+ receiver_id BIGINT NULL,
+ message_text TEXT NOT NULL,
+ message_type VARCHAR(12) NOT NULL DEFAULT 'GROUP',
+ sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(session_id) REFERENCES chat_sessions(session_id),
+ FOREIGN KEY(sender_id) REFERENCES users(user_id),
+ FOREIGN KEY(receiver_id) REFERENCES users(user_id)
+);
+CREATE TABLE IF NOT EXISTS file_transfers (
+ file_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ sender_id BIGINT NOT NULL,
+ receiver_id BIGINT NULL,
+ original_filename VARCHAR(255) NOT NULL,
+ stored_filename VARCHAR(255) NOT NULL,
+ file_size BIGINT NOT NULL,
+ file_path VARCHAR(600) NOT NULL,
+ transfer_status VARCHAR(20) NOT NULL,
+ sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(sender_id) REFERENCES users(user_id),
+ FOREIGN KEY(receiver_id) REFERENCES users(user_id)
+);
